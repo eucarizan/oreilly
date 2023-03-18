@@ -401,4 +401,4 @@ curl -v http://localhost:8080/books -H "content-type: application/json" -d "{\"t
    {"timestamp":"2023-03-18T05:27:36.301+00:00","status":400,"error":"Bad Request","path":"/books"}
    ```
 
-[<<](.\README.md#spring-boot)
+[<<](./README.md#spring-boot)
