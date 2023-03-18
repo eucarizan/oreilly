@@ -2,7 +2,7 @@
 
 - [Spring Boot](#spring-boot)
   - [Spring Boot Create](#spring-boot-create)
-    - [Create new project](#create-new-project)
+    - [Creating a Spring Boot project](#creating-a-spring-boot-project)
     - [Create a REST Controller](#create-a-rest-controller)
       - [Create Books Application](#create-books-application)
       - [Create a REST Controller](#create-a-rest-controller-1)
@@ -24,7 +24,7 @@
       - [Run and Test the Application](#run-and-test-the-application)
 
 ## Spring Boot Create
-### Create new project
+### Creating a Spring Boot project
 1. Create a basic application using the Spring Initializr using curl:
     ```
     curl https://start.spring.io/starter.zip -d dependencies=web -d type=gradle-project -d bootVersion=3.0.4 -o demo.zip
@@ -90,6 +90,10 @@
     ```
     curl http://localhost:8080/books
     ```
+    >output
+    ```
+    ["Hacking with Spring Boot 2.3","97 Things Every Java Programmer Should Know","Spring Boot: Up and Running"]
+    ```
 
 #### POST Mapping
 1. Create a method to create a new book and add it to the list of the books.
@@ -147,14 +151,14 @@
 
 ### Handling JSON
 #### Add the json dependency
-1. Add `org.springframework.boot:spring-boot-starter-json` in build.gradle
+1. Add `org.springframework.boot:spring-boot-starter-json` in `build.gradle` file
 
 #### Book POJO
 1. Create a `Book.java` class in `com.oreilly.books`
 
 #### Update book controller
-1. Update the books type from `String` to `Book`
-2. Create new book instance
+1. Update the `books` type from `String` to `Book`
+2. Create new book instance to add to the `books`
 
 #### Updating List Endpoint
 1. Update the return type to `Book`
@@ -218,18 +222,20 @@
    ```
    .\gradlew bootRun
    ```
-   output: notice the order in which constructors were called
+   >output: notice the order in which constructors were called
    ```
    BookService() called...
    BookController() called...
    ```
 
 2. List
+   >GET
    ```
    curl http://localhost:8080/books
    ```
 
 3. Create
+   >POST
    ```
    curl -X POST http://localhost:8080/books -H "content-type: application/json" -d "{\"title\": \"TEST\",\"author\": \"TEST\"}"
    ```
