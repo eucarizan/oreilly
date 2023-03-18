@@ -1,58 +1,49 @@
 package com.oreilly.books;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/books")
 public class BookController {
-    private List<Book> books;
 
-    public BookController() {
-        books = new ArrayList<>();
-        books.add(new Book("Hacking with Spring Boot 2.3","Greg L. Turnquist"));
-        books.add(new Book("97 Things Every Java Programmer Should Know", "Kevlin Henney and Trisha Gee"));
-        books.add(new Book("Spring Boot: Up and Running","Greg L. Turnquist "));
+    private final BookService bookService;
+
+    public BookController(BookService bookService) {
+        System.out.println("BookController() called...");
+        this.bookService = bookService;
     }
 
-    // list
     @GetMapping
     public List<Book> list() {
-        return books;
+        return bookService.list();
     }
 
-    // create
+    @GetMapping("/{id}")
+    public Book get(@PathVariable int id) {
+        return bookService.get(id);
+    }
+
     @PostMapping
     public void create(@RequestBody Book book) {
-        books.add(book);
+        bookService.create(book);
     }
 
-    // update
-    @PutMapping
-    public void update(@RequestBody Map<String, String> payload) {
-        String oldTitle = payload.get("oldtitle");
-        String newTitle = payload.get("newtitle");
-
-        if (books.contains(oldTitle)) {
-            // books.set(books.indexOf(oldTitle), newTitle);
-        }
+    @PutMapping("/{id}")
+    public void update(@RequestBody Book book, @PathVariable int id) {
+        bookService.update(book, id);
     }
     
-    // delete
-    @DeleteMapping
-    public void delete(@RequestParam String title) {
-        if (books.contains(title)) {
-            books.remove(books.indexOf(title));
-        }
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable int id) {
+        bookService.delete(id);
     }
 }

@@ -17,6 +17,11 @@
       - [Update book controller](#update-book-controller)
       - [Updating List Endpoint](#updating-list-endpoint)
       - [Creating a New Book](#creating-a-new-book)
+    - [Dependency Injection](#dependency-injection)
+      - [Move the logic of `BookController` to a service, Create Book Service](#move-the-logic-of-bookcontroller-to-a-service-create-book-service)
+      - [Dependency Injection](#dependency-injection-1)
+      - [Refactor the Controller](#refactor-the-controller)
+      - [Run and Test the Application](#run-and-test-the-application)
 
 ## Spring Boot Create
 ### Create new project
@@ -193,4 +198,89 @@
     {"title":"97 Things Every Java Programmer Should Know","author":"Kevlin Henney and Trisha Gee"},
     {"title":"Spring Boot: Up and Running","author":"Greg L. Turnquist"},
     {"title":"My Title","author":"My Author"}]
+   ```
+
+### Dependency Injection
+#### Move the logic of `BookController` to a service, Create Book Service
+1. Create a `BookService.java` class in `com.oreilly.books`
+2. Move the code from controller to the service
+3. Add `@Service` annotation to the class
+
+#### Dependency Injection
+1. Add the `BookService` to the `BookController` constructor
+>You might come across code where the constructor is annotated with @Autowired. This used to be required, but if there is only a single constructor you don't need to do this any longer.
+
+#### Refactor the Controller
+1. Use the `BookService` to update each method
+
+#### Run and Test the Application
+1. Run the application
+   ```
+   .\gradlew bootRun
+   ```
+   output: notice the order in which constructors were called
+   ```
+   BookService() called...
+   BookController() called...
+   ```
+
+2. List
+   ```
+   curl http://localhost:8080/books
+   ```
+
+3. Create
+   ```
+   curl -X POST http://localhost:8080/books -H "content-type: application/json" -d "{\"title\": \"TEST\",\"author\": \"TEST\"}"
+   ```
+   >GET: verify if the book was added
+   ```
+   curl http://localhost:8080/books
+   ```
+   >output
+   ```
+   [{"id":0,"title":"Hacking with Spring Boot 2.3","author":"Greg L. Turnquist"},
+    {"id":0,"title":"97 Things Every Java Programmer Should Know","author":"Kevlin Henney and Trisha Gee"},
+    {"id":0,"title":"Spring Boot: Up and Running","author":"Greg L. Turnquist "},
+    {"id":4,"title":"TEST","author":"TEST"}]
+   ```
+
+4. Read
+   >GET{id}
+   ```
+   curl http://localhost:8080/books/1
+   ```
+   >output
+   ```
+   {"id":1,"title":"Hacking with Spring Boot 2.3","author":"Greg L. Turnquist"}
+   ```
+
+5. Update
+   >UPDATE
+   ```
+   curl -X PUT http://localhost:8080/books/4 -H "content-type: application/json" -d "{\"id\": 4,\"title\": \"NEW TEST\",\"author\": \"NEW TEST\"}"
+   ```
+   >GET: verify if book was updated
+   ```
+   curl http://localhost:8080/books/4
+   ```
+   >output
+   ```
+   {"id":4,"title":"NEW TEST","author":"NEW TEST"}
+   ```
+
+6. Delete
+   >DELETE
+   ```
+   curl -X DELETE http://localhost:8080/books/1
+   ```
+   >GET: verify if book was deleted
+   ```
+   curl http://localhost:8080/books
+   ```
+   >output
+   ```
+   [{"id":2,"title":"97 Things Every Java Programmer Should Know","author":"Kevlin Henney and Trisha Gee"},
+    {"id":3,"title":"Spring Boot: Up and Running","author":"Greg L. Turnquist "},
+    {"id":4,"title":"NEW TEST","author":"NEW TEST"}]
    ```
