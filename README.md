@@ -22,6 +22,11 @@
       - [Dependency Injection](#dependency-injection-1)
       - [Refactor the Controller](#refactor-the-controller)
       - [Run and Test the Application](#run-and-test-the-application)
+    - [Handling Errors](#handling-errors)
+      - [Returning Status Codes (CREATED)](#returning-status-codes-created)
+      - [Returning Status Codes (NO\_CONTENT)](#returning-status-codes-no_content)
+      - [Book Not Found Exception](#book-not-found-exception)
+      - [Book Already Exists Exception](#book-already-exists-exception)
 
 ## Spring Boot Create
 ### Creating a Spring Boot project
@@ -289,4 +294,111 @@
    [{"id":2,"title":"97 Things Every Java Programmer Should Know","author":"Kevlin Henney and Trisha Gee"},
     {"id":3,"title":"Spring Boot: Up and Running","author":"Greg L. Turnquist "},
     {"id":4,"title":"NEW TEST","author":"NEW TEST"}]
+   ```
+
+### Handling Errors
+#### Returning Status Codes (CREATED)
+>Running the application
+```
+.\gradlew bootRun
+```
+>POST: create a new book
+```
+curl -v http://localhost:8080/books -H "content-type: application/json" -d "{\"title\": \"TEST\",\"author\": \"TEST\"}"
+```
+>ouptut: `-v` flag (verbose) will tell `curl` to print out the request and response details. If you look at the status code of the response, it's currently `200` and this is what you are going to change.
+
+1. Update the create method in `BookController` with `@ResponseStatus` annotation
+> import org.springframework.http.HttpStatus;
+2. Test the Endpoint
+   >POST
+   ```
+   curl -v http://localhost:8080/books -H "content-type: application/json" -d "{\"title\": \"TEST\",\"author\": \"TEST\"}"
+   ```
+   >output
+   ```
+   *   Trying 127.0.0.1:8080...
+   * Connected to localhost (127.0.0.1) port 8080 (#0)
+   > POST /books HTTP/1.1
+   > Host: localhost:8080
+   > User-Agent: curl/7.83.1
+   > Accept: */*
+   > content-type: application/json
+   > Content-Length: 34
+   >
+   * Mark bundle as not supporting multiuse
+   < HTTP/1.1 201
+   < Content-Length: 0
+   < Date: Sat, 18 Mar 2023 04:50:44 GMT
+   <
+   * Connection #0 to host localhost left intact
+   ```
+
+#### Returning Status Codes (NO_CONTENT)
+1. Update the update and delete method to return `204 No Content` to let the consumer know if the operation was a success or any.
+2. Test the Endpoint
+   >PUT: test for the status code
+   ```
+   curl -v -X PUT http://localhost:8080/books/1 -H "content-type: application/json" -d "{\"id\": 1,\"title\": \"NEW TEST\",\"author\": \"NEW TEST\"}"
+   ```
+   >DELETE: test for the status code
+   ```
+   curl -v -X DELETE http://localhost:8080/books/1
+   ```
+   >both method should now show a response status of `204`
+   ```
+   <HTTP/1.1 204
+   ```
+
+#### Book Not Found Exception
+If you send a GET request for a resource that doesn't exist, like book #99, you get currently get a response status `200`:
+```
+curl -v http://localhost:8080/books/99
+```
+
+1. Create a custom exception `BookNotFoundException.java`
+> This exception will return a `404 Not Found` status when it is thrown because of the `@ResponseStatus` annotation
+2. Update the `GET` method in `BookController`
+3. Test the Endpoint
+   >GET{id}
+   ```
+   curl http://localhost:8080/books/99
+   ```
+   >output
+   ```json
+   {
+    "timestamp": "2023-03-18T05:07:12.582+00:00",
+    "status": 404,
+    "error": "Not Found",
+    "path":"/books/99"
+    }
+   ```
+
+#### Book Already Exists Exception
+>POST: run multiple times
+```
+curl -v http://localhost:8080/books -H "content-type: application/json" -d "{\"title\": \"TEST\",\"author\": \"TEST\"}"
+```
+>output: post was run 2 times
+```
+[
+    {"id":1,"title":"Hacking with Spring Boot 2.3","author":"Greg L. Turnquist"},
+    {"id":2,"title":"97 Things Every Java Programmer Should Know","author":"Kevlin Henney and Trisha Gee"},
+    {"id":3,"title":"Spring Boot: Up and Running","author":"Greg L. Turnquist "},
+    {"id":4,"title":"TEST","author":"TEST"},
+    {"id":5,"title":"TEST","author":"TEST"}
+]
+```
+1. Create a custom exception `BookAlreadyExistsException.java`
+> This exception will return a `400 Bad Request` status
+2. Update the create in `BookController`
+> implement `exists()` method of `BookService`
+3. Test the Endpoint
+   >POST: run 2 times
+   ```
+   curl http://localhost:8080/books -H "content-type: application/json" -d "{\"title\": \"TEST\",\"author\": \"TEST\"}"
+   ```
+   >output
+   ```
+   {"timestamp":"2023-03-18T05:27:36.301+00:00","status":400,"error":"Bad Request","path":"/books"}
    ```
