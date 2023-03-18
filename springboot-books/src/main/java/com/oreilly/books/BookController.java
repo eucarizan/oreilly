@@ -16,25 +16,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/books")
 public class BookController {
-    private List<String> books;
+    private List<Book> books;
 
     public BookController() {
         books = new ArrayList<>();
-        books.add("Hacking with Spring Boot 2.3");
-        books.add("97 Things Every Java Programmer Should Know");
-        books.add("Spring Boot: Up and Running");
+        books.add(new Book("Hacking with Spring Boot 2.3","Greg L. Turnquist"));
+        books.add(new Book("97 Things Every Java Programmer Should Know", "Kevlin Henney and Trisha Gee"));
+        books.add(new Book("Spring Boot: Up and Running","Greg L. Turnquist "));
     }
 
     // list
     @GetMapping
-    public List<String> list() {
+    public List<Book> list() {
         return books;
     }
 
     // create
     @PostMapping
-    public void create(@RequestBody Map<String, String> payload) {
-        books.add(payload.get("title"));
+    public void create(@RequestBody Book book) {
+        books.add(book);
     }
 
     // update
@@ -44,7 +44,7 @@ public class BookController {
         String newTitle = payload.get("newtitle");
 
         if (books.contains(oldTitle)) {
-            books.set(books.indexOf(oldTitle), newTitle);
+            // books.set(books.indexOf(oldTitle), newTitle);
         }
     }
     

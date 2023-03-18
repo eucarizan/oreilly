@@ -8,35 +8,41 @@
       - [Create a REST Controller](#create-a-rest-controller-1)
       - [Books Database](#books-database)
       - [GET Mapping](#get-mapping)
-    - [POST Mapping](#post-mapping)
-    - [PUT Mapping](#put-mapping)
-    - [DELETE Mapping](#delete-mapping)
+      - [POST Mapping](#post-mapping)
+      - [PUT Mapping](#put-mapping)
+      - [DELETE Mapping](#delete-mapping)
+    - [Handling JSON](#handling-json)
+      - [Add the json dependency](#add-the-json-dependency)
+      - [Book POJO](#book-pojo)
+      - [Update book controller](#update-book-controller)
+      - [Updating List Endpoint](#updating-list-endpoint)
+      - [Creating a New Book](#creating-a-new-book)
 
 ## Spring Boot Create
 ### Create new project
-Create a basic application using the Spring Initializr using curl:
-```
-curl https://start.spring.io/starter.zip -d dependencies=web -d type=gradle-project -d bootVersion=3.0.4 -o demo.zip
-```
+1. Create a basic application using the Spring Initializr using curl:
+    ```
+    curl https://start.spring.io/starter.zip -d dependencies=web -d type=gradle-project -d bootVersion=3.0.4 -o demo.zip
+    ```
 
-Unpack the archive file:
-```
-tar -xf demo.zip
-```
+2. Unpack the archive file:
+    ```
+    tar -xf demo.zip
+    ```
 
-Run the application using Gradle:
-```
-.\gradlew bootRun
-```
+3. Run the application using Gradle:
+    ```
+    .\gradlew bootRun
+    ```
 
-View the Application
-```
-curl http://localhost:8080
-```
->output:
-```
-{"timestamp":"2023-03-18T00:14:54.510+00:00","status":404,"error":"Not Found","path":"/"}
-```
+4. View the Application
+    ```
+    curl http://localhost:8080
+    ```
+    >output:
+    ```
+    {"timestamp":"2023-03-18T00:14:54.510+00:00","status":404,"error":"Not Found","path":"/"}
+    ```
 
 ### Create a REST Controller
 #### Create Books Application
@@ -80,7 +86,7 @@ curl http://localhost:8080
     curl http://localhost:8080/books
     ```
 
-### POST Mapping
+#### POST Mapping
 1. Create a method to create a new book and add it to the list of the books.
 2. Add the `@PostMapping` annotation to the method
 3. Add the `@RequestBody` annotation to the param
@@ -98,7 +104,7 @@ curl http://localhost:8080
    ["Hacking with Spring Boot 2.3","97 Things Every Java Programmer Should Know","Spring Boot: Up and Running","TEST"]
    ```
 
-### PUT Mapping
+#### PUT Mapping
 1. Create a method to update a book
 2. Add the `@PutMapping` annotation to the method
 3. Add the `@RequestBody` annotation to the param
@@ -116,7 +122,7 @@ curl http://localhost:8080
    ["Hacking with Spring Boot 2.3","97 Things Every Java Programmer Should Know","MY NEW TITLE"]
    ```
 
-### DELETE Mapping
+#### DELETE Mapping
 1. Create a method to delete a book
 2. Add the `@DeleteMapping` annotation to the method
 3. Add the `@RequestParam` annotation to the param
@@ -132,4 +138,59 @@ curl http://localhost:8080
    >output
    ```
    ["Hacking with Spring Boot 2.3","97 Things Every Java Programmer Should Know"]
+   ```
+
+### Handling JSON
+#### Add the json dependency
+1. Add `org.springframework.boot:spring-boot-starter-json` in build.gradle
+
+#### Book POJO
+1. Create a `Book.java` class in `com.oreilly.books`
+
+#### Update book controller
+1. Update the books type from `String` to `Book`
+2. Create new book instance
+
+#### Updating List Endpoint
+1. Update the return type to `Book`
+2. Test the Endpoint
+   >GET
+   ```
+   http://localhost:8080/books
+   ```
+   >output
+   ```
+   [
+    {
+        "title": "Hacking with Spring Boot 2.3",
+        "author": "Greg L. Turnquist",
+    },
+    {
+        "title": "97 Things Every Java Programmer Should Know",
+        "author": "Kevlin Henney and Trisha Gee",
+    },
+    {
+        "title": "Spring Boot: Up and Running",
+        "author": "Greg L. Turnquist ",
+    }
+   ]
+   ```
+
+#### Creating a New Book
+1. Update the create method using the `Book` object
+2. Test the Endpoint
+   >POST: create a new book
+   ```
+   curl -X POST http://localhost:8080/books -d "{\"title\": \"My Title\", \"author\": \"My Author\"}" -H "Content-Type: application/json"
+   ```
+   >GET: verify if book was added
+   ```
+   curl http://localhost:8080/books
+   ```
+   >output
+   ```
+   [{"title":"Hacking with Spring Boot 2.3","author":"Greg L. Turnquist"},
+    {"title":"97 Things Every Java Programmer Should Know","author":"Kevlin Henney and Trisha Gee"},
+    {"title":"Spring Boot: Up and Running","author":"Greg L. Turnquist"},
+    {"title":"My Title","author":"My Author"}]
    ```
